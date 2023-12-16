@@ -42,7 +42,8 @@ public class TaskServiceImpl implements TaskService {
         if (taskOptional.isPresent()) {
             Task existingTask = taskOptional.get();
             MapperUtils.merge(taskDTO, existingTask);
-            Task updateTask = taskRepository.save(existingTask);
+            Task updatedTask = taskRepository.save(existingTask);
+            return MapperUtils.convert(updatedTask, TaskDTO.class);
         }
         return null;
     }

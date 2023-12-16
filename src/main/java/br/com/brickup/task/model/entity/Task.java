@@ -25,6 +25,6 @@ public class Task {
     private StatusTask status = StatusTask.PENDENTE;
 
     @Lob
-    @Column(name = "imagem")
+    @Column(name = "imagem", columnDefinition = "LONGBLOB")
     private byte[] imagem;
 }
