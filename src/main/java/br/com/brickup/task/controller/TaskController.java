@@ -1,5 +1,7 @@
 package br.com.brickup.task.controller;
 
+import br.com.brickup.task.exception.CustomServiceException;
+import br.com.brickup.task.exception.EntityNotFoundException;
 import br.com.brickup.task.model.dto.TaskDTO;
 import br.com.brickup.task.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,35 +20,55 @@ public class TaskController {
 
     @GetMapping
     public ResponseEntity<List<TaskDTO>> getAllTasks() {
-        List<TaskDTO> tasks = taskService.getAllTasks();
-        return new ResponseEntity<>(tasks, HttpStatus.OK);
+        try {
+            List<TaskDTO> tasks = taskService.getAllTasks();
+            return new ResponseEntity<>(tasks, HttpStatus.OK);
+        } catch (CustomServiceException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TaskDTO> getTaskById(@PathVariable Long id) {
-        TaskDTO task = taskService.getTaskById(id);
-        return task != null ?
-                new ResponseEntity<>(task, HttpStatus.OK) :
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            TaskDTO task = taskService.getTaskById(id);
+            return new ResponseEntity<>(task, HttpStatus.OK);
+        } catch (EntityNotFoundException ex) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (CustomServiceException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @PostMapping
     public ResponseEntity<TaskDTO> createTask(@RequestBody TaskDTO taskDTO) {
-        TaskDTO createdTask = taskService.createTask(taskDTO);
-        return new ResponseEntity<>(createdTask, HttpStatus.OK);
+        try {
+            TaskDTO createdTask = taskService.createTask(taskDTO);
+            return new ResponseEntity<>(createdTask, HttpStatus.CREATED);
+        } catch (CustomServiceException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<TaskDTO> updateTask(@PathVariable Long id, @RequestBody TaskDTO taskDTO) {
-        TaskDTO updatedTask = taskService.updateTask(id, taskDTO);
-        return updatedTask != null ?
-                new ResponseEntity<>(updatedTask, HttpStatus.OK) :
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            TaskDTO updatedTask = taskService.updateTask(id, taskDTO);
+            return new ResponseEntity<>(updatedTask, HttpStatus.OK);
+        } catch (EntityNotFoundException ex) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (CustomServiceException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
-        taskService.deleteTask(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        try {
+            taskService.deleteTask(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (CustomServiceException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

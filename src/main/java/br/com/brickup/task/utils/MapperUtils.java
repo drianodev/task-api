@@ -1,10 +1,13 @@
 package br.com.brickup.task.utils;
 
 import org.modelmapper.Conditions;
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,13 +27,12 @@ public class MapperUtils {
     }
 
     public static <S, T> T merge(S source, T target) {
-        // Mapeie apenas os campos que não são nulos no source
         modelMapper.getConfiguration()
                 .setPropertyCondition(Conditions.isNotNull());
 
         modelMapper.map(source, target);
 
-        // Restaure a condição padrão para o próximo uso
+
         modelMapper.getConfiguration()
                 .setPropertyCondition(Conditions.isNotNull());
 
